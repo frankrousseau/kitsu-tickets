@@ -1,0 +1,11 @@
+id = "tickets"
+name = "Tickets"
+description = "Ticket management system"
+version = "0.1.0"
+maintainer = "Frank Rousseau <frank@cg-wire.com>"
+website = "kitsu.cloud"
+license = "AGPL-3.0-only"
+maintainer_name = "Frank Rousseau"
+maintainer_email = "frank@cg-wire.com"
+frontend_project_enabled = true
+frontend_studio_enabled = true
