@@ -9,3 +9,4 @@ maintainer_name = "Frank Rousseau"
 maintainer_email = "frank@cg-wire.com"
 frontend_project_enabled = true
 frontend_studio_enabled = true
+icon = "ticket-check"
