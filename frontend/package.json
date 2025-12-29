@@ -13,7 +13,8 @@
   "dependencies": {
     "@iconify-json/lucide": "^1.2.82",
     "@iconify-json/simple-icons": "^1.2.63",
-    "@nuxt/ui": "^4.3.0",
+    "@iconify/vue": "^5.0.0",
+    "bulma": "^0.9.4",
     "kitsu-client-js": "github:cgwire/kitsu-client-js",
     "kitsu-ui": "github:cgwire/kitsu-ui",
     "nuxt": "^4.2.2"

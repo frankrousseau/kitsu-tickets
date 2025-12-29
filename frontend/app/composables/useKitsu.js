@@ -24,6 +24,10 @@ export const useKitsu = () => {
       return kitsuClientInstance.get('/plugins/tickets/tickets')
     },
 
+    createTicket: (ticketData) => {
+      return kitsuClientInstance.post('/plugins/tickets/tickets', ticketData)
+    }
+
   }
 }
 
