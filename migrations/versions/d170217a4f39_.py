@@ -22,9 +22,9 @@ def upgrade():
     op.alter_column('plugin_tickets_tickets', 'person_id',
                existing_type=sa.UUID(),
                nullable=True)
-    op.drop_index('ix_tickets_tickets_assignee_id', table_name='plugin_tickets_tickets')
-    op.drop_index('ix_tickets_tickets_person_id', table_name='plugin_tickets_tickets')
-    op.drop_index('ix_tickets_tickets_task_id', table_name='plugin_tickets_tickets')
+    op.drop_index('ix_plugin_tickets_tickets_assignee_id', table_name='plugin_tickets_tickets')
+    op.drop_index('ix_plugin_tickets_tickets_person_id', table_name='plugin_tickets_tickets')
+    op.drop_index('ix_plugin_tickets_tickets_task_id', table_name='plugin_tickets_tickets')
     op.create_index(op.f('ix_plugin_tickets_tickets_assignee_id'), 'plugin_tickets_tickets', ['assignee_id'], unique=False)
     op.create_index(op.f('ix_plugin_tickets_tickets_person_id'), 'plugin_tickets_tickets', ['person_id'], unique=False)
     op.create_index(op.f('ix_plugin_tickets_tickets_task_id'), 'plugin_tickets_tickets', ['task_id'], unique=False)
@@ -36,9 +36,9 @@ def downgrade():
     op.drop_index(op.f('ix_plugin_tickets_tickets_task_id'), table_name='plugin_tickets_tickets')
     op.drop_index(op.f('ix_plugin_tickets_tickets_person_id'), table_name='plugin_tickets_tickets')
     op.drop_index(op.f('ix_plugin_tickets_tickets_assignee_id'), table_name='plugin_tickets_tickets')
-    op.create_index('ix_tickets_tickets_task_id', 'plugin_tickets_tickets', ['task_id'], unique=False)
-    op.create_index('ix_tickets_tickets_person_id', 'plugin_tickets_tickets', ['person_id'], unique=False)
-    op.create_index('ix_tickets_tickets_assignee_id', 'plugin_tickets_tickets', ['assignee_id'], unique=False)
+    op.create_index('ix_plugin_tickets_tickets_task_id', 'plugin_tickets_tickets', ['task_id'], unique=False)
+    op.create_index('ix_plugin_tickets_tickets_person_id', 'plugin_tickets_tickets', ['person_id'], unique=False)
+    op.create_index('ix_plugin_tickets_tickets_assignee_id', 'plugin_tickets_tickets', ['assignee_id'], unique=False)
     op.alter_column('plugin_tickets_tickets', 'person_id',
                existing_type=sa.UUID(),
                nullable=False)
