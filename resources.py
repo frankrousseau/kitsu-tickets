@@ -1,61 +1,73 @@
+from uuid import UUID
+from typing import Optional, Literal
+
+from flask import request
 from flask_restful import Resource
 from flask_jwt_extended import jwt_required
+from pydantic import BaseModel
 
-from .models import Ticket
-
-from zou.app.utils import fields
 from zou.app.mixin import ArgsMixin
-from zou.app.services.exception import NotFound
 
-from zou.app.services.persons_service import get_current_user
-from zou.app.services.exception import NotFound
+from . import services
+
+
+class TicketCreateSchema(BaseModel):
+    title: str
+    text: str
+    status: Literal["open", "on hold", "closed"] = "open"
+    task_id: UUID
+    assignee_id: Optional[UUID] = None
+    project_id: Optional[UUID] = None
+    episode_id: Optional[UUID] = None
+
+
+class TicketUpdateSchema(BaseModel):
+    title: Optional[str] = None
+    text: Optional[str] = None
+    status: Optional[Literal["open", "on hold", "closed"]] = None
+    assignee_id: Optional[UUID] = None
 
 
 class TicketsResource(Resource, ArgsMixin):
 
     @jwt_required()
     def get(self):
-        tickets = Ticket.query().all()
-        return fields.serialize_list(tickets)
+        tickets = services.get_all_tickets()
+        return [t.present() for t in tickets]
 
     @jwt_required()
     def post(self):
-        person_id = get_current_user()["id"]
-        args = self.get_args([
-            ("title", "", True),
-            ("text", "", True),
-            ("status", "open", True),
-            ("task_id", None, True),
-            ("assignee_id", None, True),
-            ("project_id", None, True),
-            ("episode_id", None, True),
-        ])
-        ticket = Ticket(
-            title=args["title"],
-            text=args["text"],
-            status=args["status"],
-            task_id=args["task_id"],
-            person_id=person_id,
-            assignee_id=args["assignee_id"],
-            project_id=args["project_id"],
-            episode_id=args["episode_id"],
-        )
-        ticket.save()
-        return ticket.serialize(), 201
+        data = TicketCreateSchema(**request.get_json())
+        ticket = services.create_ticket(data.model_dump(mode="json"))
+        return ticket.present(), 201
 
-class TicketResource(Resource):
+
+class TicketResource(Resource, ArgsMixin):
 
     @jwt_required()
-    def get(self, id):
-        ticket = Ticket.query().get(id)
+    def get(self, ticket_id):
+        self.check_id_parameter(ticket_id)
+        ticket = services.get_ticket(ticket_id)
         if not ticket:
-            raise NotFoundException("Ticket not found")
-        return ticket.serialize()
+            return {"error": "Ticket not found"}, 404
+        return ticket.present()
 
     @jwt_required()
-    def delete(self, id):
-        ticket = Ticket.query().get(id)
+    def put(self, ticket_id):
+        self.check_id_parameter(ticket_id)
+        ticket = services.get_ticket(ticket_id)
         if not ticket:
-            raise NotFound("Ticket not found")
-        ticket.delete()
+            return {"error": "Ticket not found"}, 404
+        data = TicketUpdateSchema(**request.get_json())
+        updated = data.model_dump(exclude_unset=True, mode="json")
+        ticket = services.update_ticket(ticket, updated)
+        return ticket.present()
+
+    @jwt_required()
+    def delete(self, ticket_id):
+        self.check_id_parameter(ticket_id)
+        ticket = services.get_ticket(ticket_id)
+        if not ticket:
+            return {"error": "Ticket not found"}, 404
+        services.delete_ticket(ticket)
         return "", 204

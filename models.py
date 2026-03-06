@@ -1,17 +1,8 @@
-from sqlalchemy import MetaData
-from sqlalchemy.util import FacadeDict
-from sqlalchemy.orm import declarative_base
-
 from sqlalchemy_utils import UUIDType, ChoiceType
 
 from zou.app import db
 from zou.app.models.serializer import SerializerMixin
 from zou.app.models.base import BaseMixin
-from zou.app.utils.plugins import create_plugin_metadata
-
-
-plugin_metadata = create_plugin_metadata("tickets") # plugin id
-PluginBase = declarative_base(metadata=plugin_metadata)
 
 
 TICKET_STATUSES = [
@@ -21,7 +12,7 @@ TICKET_STATUSES = [
 ]
 
 
-class Ticket(PluginBase, BaseMixin, SerializerMixin):
+class Ticket(db.Model, BaseMixin, SerializerMixin):
     """
     Allow to open an issue on a given task.
     """
@@ -60,3 +51,20 @@ class Ticket(PluginBase, BaseMixin, SerializerMixin):
         nullable=True,
         index=True,
     )
+
+    def present(self):
+        return {
+            "id": str(self.id),
+            "title": self.title,
+            "text": self.text,
+            "status": str(self.status),
+            "task_id": str(self.task_id) if self.task_id else None,
+            "project_id": str(self.project_id) if self.project_id else None,
+            "episode_id": str(self.episode_id) if self.episode_id else None,
+            "person_id": str(self.person_id) if self.person_id else None,
+            "assignee_id": (
+                str(self.assignee_id) if self.assignee_id else None
+            ),
+            "created_at": str(self.created_at),
+            "updated_at": str(self.updated_at),
+        }

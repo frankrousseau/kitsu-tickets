@@ -1,8 +1,8 @@
 from . import resources
 
 routes = [
-    (f"/tickets", resources.TicketsResource),
-    (f"/tickets/<id>", resources.TicketResource),
+    ("/tickets", resources.TicketsResource),
+    ("/tickets/<ticket_id>", resources.TicketResource),
 ]
 
 

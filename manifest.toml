@@ -1,7 +1,7 @@
 id = "tickets"
 name = "Tickets"
 description = "Ticket management system"
-version = "0.1.0"
+version = "0.2.0"
 maintainer = "Frank Rousseau <frank@cg-wire.com>"
 website = "kitsu.cloud"
 license = "AGPL-3.0-only"

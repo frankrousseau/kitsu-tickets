@@ -19,11 +19,7 @@ module = importlib.util.module_from_spec(spec)
 sys.modules[module_name] = module
 spec.loader.exec_module(module)
 
-# Add zou tables
-module.plugin_metadata.tables = {
-    **db.metadata.tables,
-    **module.plugin_metadata.tables,
-}
+plugin_prefix = f"plugin_{manifest['id']}_"
 
 # Database URL (passed by Alembic)
 config = context.config
@@ -37,7 +33,7 @@ logger = logging.getLogger("alembic.env")
 
 def include_object(object, name, type_, reflected, compare_to):
     if type_ == "table":
-        return not reflected or name in module.plugin_metadata.tables
+        return name.startswith(plugin_prefix)
     return True
 
 
@@ -61,7 +57,7 @@ def run_migrations_online():
     with connectable.connect() as connection:
         context.configure(
             connection=connection,
-            target_metadata=module.plugin_metadata,
+            target_metadata=db.metadata,
             version_table=f"alembic_version_{manifest['id']}",
             compare_type=True,
             include_object=include_object,
