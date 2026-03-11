@@ -6,19 +6,11 @@ export const useKitsu = () => {
   const apiBaseUrl = "/api"
 
   if (!kitsuClientInstance) {
-    console.log("Creating client", kitsuClient)
     kitsuClientInstance = kitsuClient.createClient(apiBaseUrl)
   }
 
   return {
     client: kitsuClientInstance,
-
-    context: (email, password) => {
-      return kitsuClientInstance.context(email, password)
-    },
-    getOpenProductions: () => {
-      return kitsuClientInstance.getOpenProductions()
-    },
 
     fetchTickets: (productionId, episodeId) => {
       const query = {}
@@ -35,18 +27,17 @@ export const useKitsu = () => {
       return kitsuClientInstance.post("/plugins/tickets/tickets", ticketData)
     },
 
-    deleteTicket: (ticketId) => {
-      return kitsuClientInstance.delete(`/plugins/tickets/tickets/${ticketId}`)
-    },
-
-    getAssetTypes: (projectId) => {
-      return kitsuClientInstance.get(
-        `/api/data/projects/${projectId}/asset-types`,
+    updateTicket: (ticketId, ticketData) => {
+      return kitsuClientInstance.put(
+        `/plugins/tickets/tickets/${ticketId}`,
+        ticketData
       )
     },
 
-    getAssets: (projectId) => {
-      return kitsuClientInstance.get(`/api/data/projects/${projectId}/assets`)
-    },
+    deleteTicket: (ticketId) => {
+      return kitsuClientInstance.delete(
+        `/plugins/tickets/tickets/${ticketId}`
+      )
+    }
   }
 }

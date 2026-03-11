@@ -1,9 +1,7 @@
 <template>
   <UModal
     title="Create New Ticket"
-    :close="{
-      variant: 'outline',
-    }"
+    :close="{ variant: 'outline' }"
     v-model="isOpen"
   >
     <UButton
@@ -43,7 +41,7 @@
             />
           </UFormField>
 
-          <UFormField name="task_id" label="Task ID (optional)">
+          <UFormField name="task_id" label="Task ID">
             <UInput
               v-model="ticket.task_id"
               placeholder="Enter task ID"
@@ -51,7 +49,7 @@
             />
           </UFormField>
 
-          <UFormField name="assignee_id" label="Assignee ID (optional)">
+          <UFormField name="assignee_id" label="Assignee ID">
             <UInput
               v-model="ticket.assignee_id"
               placeholder="Enter assignee ID"
@@ -74,109 +72,83 @@
 const props = defineProps({
   modelValue: {
     type: Boolean,
-    default: false,
-  },
-  title: {
-    type: String,
-    default: "Create New Ticket",
+    default: false
   },
   productionId: {
     type: String,
-    default: null,
+    default: null
   },
   episodeId: {
     type: String,
-    default: null,
+    default: null
   },
   isLoading: {
     type: Boolean,
-    default: false,
-  },
-});
+    default: false
+  }
+})
 
-const emit = defineEmits(["update:modelValue", "submit", "close"]);
+const emit = defineEmits(['update:modelValue', 'submit', 'close'])
 
 const isOpen = computed({
   get: () => props.modelValue,
   set: (newValue) => {
-    emit("update:modelValue", newValue);
+    emit('update:modelValue', newValue)
     if (!newValue) {
-      resetForm();
-      emit("close");
+      resetForm()
+      emit('close')
     }
-  },
-});
+  }
+})
 
 const ticket = ref({
-  title: "",
-  text: "",
-  status: "open",
-  task_id: "",
-  assignee_id: "",
-});
+  title: '',
+  text: '',
+  status: 'open',
+  task_id: '',
+  assignee_id: ''
+})
 
 const statusOptions = [
-  { label: "Open", value: "OPEN" },
-  { label: "On Hold", value: "on hold" },
-  { label: "Closed", value: "closed" },
-];
+  { label: 'Open', value: 'open' },
+  { label: 'On Hold', value: 'on hold' },
+  { label: 'Closed', value: 'closed' }
+]
 
 const resetForm = () => {
   ticket.value = {
-    title: "",
-    text: "",
-    status: "open",
-    task_id: "",
-    assignee_id: "",
-  };
-};
-
-const handleClose = () => {
-  emit("update:modelValue", false);
-  resetForm();
-  emit("close");
-};
+    title: '',
+    text: '',
+    status: 'open',
+    task_id: '',
+    assignee_id: ''
+  }
+}
 
 const handleSubmit = () => {
   const ticketData = {
     title: ticket.value.title || null,
     text: ticket.value.text || null,
-    status: ticket.value.status || "open",
+    status: ticket.value.status || 'open',
     task_id: ticket.value.task_id || null,
     assignee_id: ticket.value.assignee_id || null,
     project_id: props.productionId || null,
-    episode_id: props.episodeId || null,
-  };
-
-  Object.keys(ticketData).forEach((key) => {
-    if (ticketData[key] === "") {
-      ticketData[key] = null;
-    }
-  });
-
-  emit("submit", ticketData);
-};
-
-// Watch for when modal opens to reset form
-watch(
-  () => props.modelValue,
-  (newValue) => {
-    if (newValue) {
-      resetForm();
-    }
+    episode_id: props.episodeId || null
   }
-);
+  emit('submit', ticketData)
+}
 
-// Watch for when loading completes to close modal
-watch(
-  () => props.isLoading,
-  (newValue, oldValue) => {
-    // When loading goes from true to false, close the modal
-    if (oldValue === true && newValue === false && props.modelValue) {
-      isOpen.value = false;
-    }
+watch(() => props.modelValue, (newValue) => {
+  if (newValue) {
+    resetForm()
   }
-);
+})
+
+watch(() => props.isLoading, (newValue, oldValue) => {
+  if (oldValue === true && newValue === false && props.modelValue) {
+    isOpen.value = false
+  }
+})
 </script>
 
 <style scoped>

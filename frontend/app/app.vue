@@ -1,4 +1,13 @@
 <script setup>
+const route = useRoute()
+const colorMode = useColorMode()
+
+const isDarkTheme = computed(() => route.query.dark_theme === 'true')
+
+watch(isDarkTheme, (dark) => {
+  colorMode.preference = dark ? 'dark' : 'light'
+}, { immediate: true })
+
 useHead({
   meta: [
     { name: 'viewport', content: 'width=device-width, initial-scale=1' }

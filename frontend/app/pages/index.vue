@@ -1,42 +1,36 @@
 <template>
-  <div v-if="isLoading">
-    <div class="flex items-center gap-4">
-      <div class="flex items-center gap-2">Loading...</div>
-      <UIcon name="i-lucide-loader-circle" class="animate-spin" />
-      <div class="grid gap-2">
-        <USkeleton class="h-4 w-[250px]" />
-        <USkeleton class="h-4 w-[200px]" />
-        <USkeleton class="h-4 w-[200px]" />
-        <USkeleton class="h-4 w-[200px]" />
-      </div>
-    </div>
+  <div v-if="isLoading" class="loading-state">
+    <UIcon name="i-lucide-loader-circle" class="animate-spin" size="24" />
+    <span>Loading tickets...</span>
   </div>
 
-  <div v-else-if="!isLoggedIn">
-    <div class="empty-state">Not logged in</div>
+  <div v-else-if="!isLoggedIn" class="empty-state">
+    <UIcon name="i-lucide-log-in" size="48" />
+    <p class="empty-text">Not logged in</p>
   </div>
 
-  <div class="tickets-container" v-else>
-    <p v-if="productionId">Production ID: {{ productionId }}</p>
-    <p v-if="episodeId">Episode ID: {{ episodeId }}</p>
-    <p v-if="isStudioPage">Studio Page</p>
-    <div class="tickets-header flex">
-      <span class="flex-1"></span>
-      <div class="cursor-pointer">
+  <div v-else class="tickets-container">
+    <div class="tickets-header">
+      <div class="header-content">
+        <div>
+          <h1 class="tickets-title">Tickets</h1>
+          <p class="tickets-count">
+            {{ filteredTickets.length }} ticket{{ filteredTickets.length !== 1 ? 's' : '' }}
+            <span v-if="isStudioPage"> across all productions</span>
+          </p>
+        </div>
         <CreateTicketModal
-          ref=""
           :is-loading="isCreating"
           :production-id="productionId"
           :episode-id="episodeId"
+          v-model="isCreateModalOpen"
           @submit="handleCreateTicket"
           @close="closeModal"
-          v-model="isCreateModalOpen"
         />
       </div>
     </div>
 
     <TicketList
-      v-if="!isLoading"
       :tickets="filteredTickets"
       :deleting-ticket-id="deletingTicketId"
       @delete="handleDeleteTicket"
@@ -45,94 +39,80 @@
 </template>
 
 <script setup>
-const route = useRoute();
-const colorMode = useColorMode();
+const route = useRoute()
 
-const { client, fetchTickets, createTicket, deleteTicket } = useKitsu();
+const { client, fetchTickets, createTicket, deleteTicket } = useKitsu()
 
-const isLoggedIn = ref(null);
-const tickets = ref([]);
-const isLoading = ref(true);
-const isCreateModalOpen = ref(false);
-const isCreating = ref(false);
-const deletingTicketId = ref(null);
+const isLoggedIn = ref(null)
+const tickets = ref([])
+const isLoading = ref(true)
+const isCreateModalOpen = ref(false)
+const isCreating = ref(false)
+const deletingTicketId = ref(null)
 
-const productionId = computed(() => route.query.production_id);
-const episodeId = computed(() => route.query.episode_id);
-const isDarkTheme = computed(() => route.query.dark_theme === "true");
-const isStudioPage = computed(() => !productionId.value && !episodeId.value);
-
-colorMode.value = "light";
+const productionId = computed(() => route.query.production_id)
+const episodeId = computed(() => route.query.episode_id)
+const isStudioPage = computed(() => !productionId.value && !episodeId.value)
 
 onMounted(() => {
-  fetchData();
-});
+  fetchData()
+})
 
 const filteredTickets = computed(() => {
   return tickets.value.filter((ticket) => {
     if (isStudioPage.value) {
-      return true;
-    } else if (productionId.value) {
-      return ticket.project_id === productionId.value;
+      return true
     } else if (episodeId.value) {
       return (
-        ticket.project_id === productionId.value &&
-        ticket.episode_id === episodeId.value
-      );
+        ticket.project_id === productionId.value
+        && ticket.episode_id === episodeId.value
+      )
+    } else if (productionId.value) {
+      return ticket.project_id === productionId.value
     }
-  });
-});
+    return true
+  })
+})
 
 const fetchData = async () => {
   try {
-    isLoading.value = true;
-    const isLoggedInResponse = await client.isLoggedIn();
-    isLoggedIn.value = isLoggedInResponse.isLoggedIn;
-
-    tickets.value = await fetchTickets(productionId.value, episodeId.value);
+    isLoading.value = true
+    const isLoggedInResponse = await client.isLoggedIn()
+    isLoggedIn.value = isLoggedInResponse.isLoggedIn
+    tickets.value = await fetchTickets(productionId.value, episodeId.value)
   } catch (error) {
-    console.error("Error fetching data:", error);
-    tickets.value = [];
+    console.error('Error fetching data:', error)
+    tickets.value = []
   } finally {
-    isLoading.value = false;
+    isLoading.value = false
   }
-};
+}
 
 const handleCreateTicket = async (ticketData) => {
   try {
-    isCreating.value = true;
-
-    const createdTicket = await createTicket(ticketData);
-    tickets.value.unshift(createdTicket);
+    isCreating.value = true
+    const createdTicket = await createTicket(ticketData)
+    tickets.value.unshift(createdTicket)
   } catch (error) {
-    console.error("Error creating ticket:", error);
-    alert("Failed to create ticket: " + (error.message || "Unknown error"));
-    isCreateModalOpen.value = true;
+    console.error('Error creating ticket:', error)
   } finally {
-    isCreating.value = false;
+    isCreating.value = false
   }
-};
+}
 
 const closeModal = () => {
-  isCreateModalOpen.value = false;
-};
+  isCreateModalOpen.value = false
+}
 
 const handleDeleteTicket = async (ticket) => {
-  if (!ticket.id) {
-    console.error("Ticket ID is missing");
-    return;
-  }
-
-  deletingTicketId.value = ticket.id;
-
+  deletingTicketId.value = ticket.id
   try {
-    await deleteTicket(ticket.id);
-    tickets.value = tickets.value.filter((t) => t.id !== ticket.id);
+    await deleteTicket(ticket.id)
+    tickets.value = tickets.value.filter((t) => t.id !== ticket.id)
   } catch (error) {
-    console.error("Error deleting ticket:", error);
-    alert("Failed to delete ticket: " + (error.message || "Unknown error"));
+    console.error('Error deleting ticket:', error)
   } finally {
-    deletingTicketId.value = null;
+    deletingTicketId.value = null
   }
-};
+}
 </script>
