@@ -17,7 +17,8 @@
     "kitsu-client-js": "github:cgwire/kitsu-client-js",
     "kitsu-ui": "github:cgwire/kitsu-ui",
     "nuxt": "^4.2.2",
-    "sass": "^1.97.1"
+    "sass": "^1.97.1",
+    "vue-i18n": "^11.0.0"
   },
   "devDependencies": {
     "@nuxt/eslint": "^1.12.1",

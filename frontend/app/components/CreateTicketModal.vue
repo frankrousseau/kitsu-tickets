@@ -1,6 +1,6 @@
 <template>
   <UModal
-    title="Create New Ticket"
+    :title="$t('tickets.create.modal_title')"
     :close="{ variant: 'outline' }"
     v-model="isOpen"
   >
@@ -8,58 +8,58 @@
       icon="i-lucide-plus"
       class="cursor-pointer"
       color="neutral"
-      label="Create Ticket"
+      :label="$t('tickets.create.submit')"
       variant="subtle"
     />
 
     <template #body>
       <div class="modal-content">
         <UForm :state="ticket" @submit="handleSubmit" class="ticket-form">
-          <UFormField name="title" label="Title" required>
+          <UFormField name="title" :label="$t('tickets.create.title')" required>
             <UInput
               v-model="ticket.title"
-              placeholder="Enter ticket title"
+              :placeholder="$t('tickets.create.title_placeholder')"
               :disabled="isLoading"
             />
           </UFormField>
 
-          <UFormField name="text" label="Description">
+          <UFormField name="text" :label="$t('tickets.create.description')">
             <UTextarea
               v-model="ticket.text"
-              placeholder="Enter ticket description"
+              :placeholder="$t('tickets.create.description_placeholder')"
               :rows="4"
               :disabled="isLoading"
             />
           </UFormField>
 
-          <UFormField name="status" label="Status">
+          <UFormField name="status" :label="$t('tickets.create.status')">
             <USelect
               v-model="ticket.status"
               :options="statusOptions"
-              placeholder="Select status"
+              :placeholder="$t('tickets.create.status_placeholder')"
               :disabled="isLoading"
             />
           </UFormField>
 
-          <UFormField name="task_id" label="Task ID">
+          <UFormField name="task_id" :label="$t('tickets.create.task_id')">
             <UInput
               v-model="ticket.task_id"
-              placeholder="Enter task ID"
+              :placeholder="$t('tickets.create.task_id_placeholder')"
               :disabled="isLoading"
             />
           </UFormField>
 
-          <UFormField name="assignee_id" label="Assignee ID">
+          <UFormField name="assignee_id" :label="$t('tickets.create.assignee_id')">
             <UInput
               v-model="ticket.assignee_id"
-              placeholder="Enter assignee ID"
+              :placeholder="$t('tickets.create.assignee_id_placeholder')"
               :disabled="isLoading"
             />
           </UFormField>
 
           <div class="form-actions">
             <UButton type="submit" color="primary" :loading="isLoading">
-              Create Ticket
+              {{ $t('tickets.create.submit') }}
             </UButton>
           </div>
         </UForm>
@@ -69,6 +69,10 @@
 </template>
 
 <script setup>
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
 const props = defineProps({
   modelValue: {
     type: Boolean,
@@ -109,11 +113,11 @@ const ticket = ref({
   assignee_id: ''
 })
 
-const statusOptions = [
-  { label: 'Open', value: 'open' },
-  { label: 'On Hold', value: 'on hold' },
-  { label: 'Closed', value: 'closed' }
-]
+const statusOptions = computed(() => [
+  { label: t('tickets.status.open'), value: 'open' },
+  { label: t('tickets.status.on_hold'), value: 'on hold' },
+  { label: t('tickets.status.closed'), value: 'closed' }
+])
 
 const resetForm = () => {
   ticket.value = {
@@ -126,12 +130,13 @@ const resetForm = () => {
 }
 
 const handleSubmit = () => {
+  const emptyToNull = (value) => (value && value.trim() ? value.trim() : null)
   const ticketData = {
-    title: ticket.value.title || null,
-    text: ticket.value.text || null,
+    title: ticket.value.title || '',
+    text: ticket.value.text || '',
     status: ticket.value.status || 'open',
-    task_id: ticket.value.task_id || null,
-    assignee_id: ticket.value.assignee_id || null,
+    task_id: emptyToNull(ticket.value.task_id),
+    assignee_id: emptyToNull(ticket.value.assignee_id),
     project_id: props.productionId || null,
     episode_id: props.episodeId || null
   }
@@ -164,6 +169,6 @@ watch(() => props.isLoading, (newValue, oldValue) => {
   gap: 0.75rem;
   margin-top: 1rem;
   padding-top: 1rem;
-  border-top: 1px solid var(--color-gray-200);
+  border-top: 1px solid var(--border-primary);
 }
 </style>
