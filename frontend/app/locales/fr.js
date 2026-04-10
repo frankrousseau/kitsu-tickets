@@ -33,6 +33,8 @@ export default {
       description_placeholder: 'Saisir la description du ticket',
       status: 'Statut',
       status_placeholder: 'Sélectionner un statut',
+      project: 'Production',
+      project_placeholder: 'Sélectionner une production',
       task_id: 'ID de la tâche',
       task_id_placeholder: 'Saisir l\'ID de la tâche',
       assignee_id: 'ID de l\'assigné',

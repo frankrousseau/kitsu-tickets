@@ -33,6 +33,8 @@ export default {
       description_placeholder: 'Enter ticket description',
       status: 'Status',
       status_placeholder: 'Select status',
+      project: 'Production',
+      project_placeholder: 'Select a production',
       task_id: 'Task ID',
       task_id_placeholder: 'Enter task ID',
       assignee_id: 'Assignee ID',

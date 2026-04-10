@@ -35,9 +35,20 @@
           <UFormField name="status" :label="$t('tickets.create.status')">
             <USelect
               v-model="ticket.status"
-              :options="statusOptions"
+              :items="statusOptions"
               :placeholder="$t('tickets.create.status_placeholder')"
               :disabled="isLoading"
+            />
+          </UFormField>
+
+          <UFormField name="project_id" :label="$t('tickets.create.project')">
+            <USelectMenu
+              v-model="ticket.project_id"
+              :items="productionOptions"
+              value-key="value"
+              :placeholder="$t('tickets.create.project_placeholder')"
+              :disabled="isLoading"
+              :loading="isLoadingProductions"
             />
           </UFormField>
 
@@ -72,6 +83,7 @@
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
+const { getOpenProductions } = useKitsu()
 
 const props = defineProps({
   modelValue: {
@@ -94,6 +106,9 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue', 'submit', 'close'])
 
+const productions = ref([])
+const isLoadingProductions = ref(false)
+
 const isOpen = computed({
   get: () => props.modelValue,
   set: (newValue) => {
@@ -109,6 +124,7 @@ const ticket = ref({
   title: '',
   text: '',
   status: 'open',
+  project_id: null,
   task_id: '',
   assignee_id: ''
 })
@@ -119,11 +135,31 @@ const statusOptions = computed(() => [
   { label: t('tickets.status.closed'), value: 'closed' }
 ])
 
+const productionOptions = computed(() =>
+  productions.value.map((p) => ({
+    label: p.name,
+    value: p.id
+  }))
+)
+
+const fetchProductions = async () => {
+  isLoadingProductions.value = true
+  try {
+    productions.value = await getOpenProductions()
+  } catch (error) {
+    console.error('Error fetching productions:', error)
+    productions.value = []
+  } finally {
+    isLoadingProductions.value = false
+  }
+}
+
 const resetForm = () => {
   ticket.value = {
     title: '',
     text: '',
     status: 'open',
+    project_id: props.productionId || null,
     task_id: '',
     assignee_id: ''
   }
@@ -137,11 +173,15 @@ const handleSubmit = () => {
     status: ticket.value.status || 'open',
     task_id: emptyToNull(ticket.value.task_id),
     assignee_id: emptyToNull(ticket.value.assignee_id),
-    project_id: props.productionId || null,
+    project_id: ticket.value.project_id || null,
     episode_id: props.episodeId || null
   }
   emit('submit', ticketData)
 }
+
+onMounted(() => {
+  fetchProductions()
+})
 
 watch(() => props.modelValue, (newValue) => {
   if (newValue) {

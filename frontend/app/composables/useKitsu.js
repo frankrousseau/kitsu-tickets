@@ -12,6 +12,10 @@ export const useKitsu = () => {
   return {
     client: kitsuClientInstance,
 
+    getOpenProductions: () => {
+      return kitsuClientInstance.getOpenProductions()
+    },
+
     fetchTickets: (productionId, episodeId) => {
       const query = {}
       if (productionId) {
