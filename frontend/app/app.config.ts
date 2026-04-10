@@ -1,7 +1,7 @@
 export default defineAppConfig({
   ui: {
-    primary: 'black',
-    gray: 'slate'
+    primary: 'green',
+    neutral: 'neutral'
   },
   fonts: {
     families: [
