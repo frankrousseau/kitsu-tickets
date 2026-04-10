@@ -4,7 +4,7 @@ from typing import Optional, Literal
 from flask import request
 from flask_restful import Resource
 from flask_jwt_extended import jwt_required
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 
 from zou.app.mixin import ArgsMixin
 
@@ -25,7 +25,10 @@ class TicketUpdateSchema(BaseModel):
     title: Optional[str] = None
     text: Optional[str] = None
     status: Optional[Literal["open", "on hold", "closed"]] = None
+    task_id: Optional[UUID] = None
     assignee_id: Optional[UUID] = None
+    project_id: Optional[UUID] = None
+    episode_id: Optional[UUID] = None
 
 
 class TicketsResource(Resource, ArgsMixin):
@@ -37,7 +40,10 @@ class TicketsResource(Resource, ArgsMixin):
 
     @jwt_required()
     def post(self):
-        data = TicketCreateSchema(**request.get_json())
+        try:
+            data = TicketCreateSchema(**request.get_json())
+        except ValidationError as e:
+            return {"error": e.errors()}, 400
         ticket = services.create_ticket(data.model_dump(mode="json"))
         return ticket.present(), 201
 
@@ -58,7 +64,10 @@ class TicketResource(Resource, ArgsMixin):
         ticket = services.get_ticket(ticket_id)
         if not ticket:
             return {"error": "Ticket not found"}, 404
-        data = TicketUpdateSchema(**request.get_json())
+        try:
+            data = TicketUpdateSchema(**request.get_json())
+        except ValidationError as e:
+            return {"error": e.errors()}, 400
         updated = data.model_dump(exclude_unset=True, mode="json")
         ticket = services.update_ticket(ticket, updated)
         return ticket.present()
