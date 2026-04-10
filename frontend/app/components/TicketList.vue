@@ -66,7 +66,7 @@
               <UIcon name="i-lucide-factory" class="meta-icon" />
               <span class="meta-label">{{ $t('tickets.fields.production') }}</span>
               <span class="meta-value">
-                {{ formatId(ticket.project_id) }}
+                {{ productionName(ticket.project_id) }}
               </span>
             </span>
             <span v-if="ticket.episode_id" class="meta-item">
@@ -114,11 +114,27 @@ const props = defineProps({
     required: true,
     default: () => []
   },
+  productions: {
+    type: Array,
+    default: () => []
+  },
   deletingTicketId: {
     type: String,
     default: null
   }
 })
+
+const productionMap = computed(() => {
+  const map = {}
+  for (const p of props.productions) {
+    map[p.id] = p.name
+  }
+  return map
+})
+
+const productionName = (id) => {
+  return productionMap.value[id] || formatId(id)
+}
 
 const emit = defineEmits(['delete'])
 

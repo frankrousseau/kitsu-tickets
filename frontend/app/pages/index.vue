@@ -32,6 +32,7 @@
 
     <TicketList
       :tickets="filteredTickets"
+      :productions="productions"
       :deleting-ticket-id="deletingTicketId"
       @delete="handleDeleteTicket"
     />
@@ -41,10 +42,11 @@
 <script setup>
 const route = useRoute()
 
-const { client, fetchTickets, createTicket, deleteTicket } = useKitsu()
+const { client, getOpenProductions, fetchTickets, createTicket, deleteTicket } = useKitsu()
 
 const isLoggedIn = ref(null)
 const tickets = ref([])
+const productions = ref([])
 const isLoading = ref(true)
 const isCreateModalOpen = ref(false)
 const isCreating = ref(false)
@@ -79,7 +81,12 @@ const fetchData = async () => {
     isLoading.value = true
     const isLoggedInResponse = await client.isLoggedIn()
     isLoggedIn.value = isLoggedInResponse.isLoggedIn
-    tickets.value = await fetchTickets(productionId.value, episodeId.value)
+    const [ticketsData, productionsData] = await Promise.all([
+      fetchTickets(productionId.value, episodeId.value),
+      getOpenProductions()
+    ])
+    tickets.value = ticketsData
+    productions.value = productionsData
   } catch (error) {
     console.error('Error fetching data:', error)
     tickets.value = []
