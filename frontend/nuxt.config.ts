@@ -12,6 +12,10 @@ export default defineNuxtConfig({
   ],
 
 
+  colorMode: {
+    storageKey: null
+  },
+
   devtools: {
     enabled: true
   },

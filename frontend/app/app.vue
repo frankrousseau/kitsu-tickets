@@ -1,12 +1,23 @@
 <script setup>
 const route = useRoute()
-const colorMode = useColorMode()
 
-const isDarkTheme = computed(() => route.query.dark_theme === 'true')
+const applyTheme = (dark) => {
+  document.documentElement.classList.toggle('dark', dark)
+}
 
-watch(isDarkTheme, (dark) => {
-  colorMode.preference = dark ? 'dark' : 'light'
+// Apply theme from query param
+watch(() => route.query.dark_theme, (value) => {
+  applyTheme(value === 'true')
 }, { immediate: true })
+
+// Listen for theme changes from parent Kitsu window
+onMounted(() => {
+  window.addEventListener('message', (event) => {
+    if (event.data && 'dark_theme' in event.data) {
+      applyTheme(!!event.data.dark_theme)
+    }
+  })
+})
 
 useHead({
   meta: [
@@ -21,7 +32,7 @@ useHead({
 })
 
 const title = 'Ticket plugin'
-const description = 'Ticket systems to add issue tracking to Kitsu tasks.'
+const description = 'Ticket system to add issue tracking to Kitsu tasks.'
 
 useSeoMeta({
   title,
