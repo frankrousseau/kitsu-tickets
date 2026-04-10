@@ -16,8 +16,52 @@ export const useKitsu = () => {
       return kitsuClientInstance.getOpenProductions()
     },
 
+    getProject: (projectId) => {
+      return kitsuClientInstance.get(`/data/projects/${projectId}`)
+    },
+
     getPeople: () => {
       return kitsuClientInstance.get("/data/persons")
+    },
+
+    getAssetTypes: (projectId) => {
+      return kitsuClientInstance.get(`/data/projects/${projectId}/asset-types`)
+    },
+
+    getAssets: (projectId) => {
+      return kitsuClientInstance.get(`/data/projects/${projectId}/assets`)
+    },
+
+    getShots: (projectId) => {
+      return kitsuClientInstance.get(`/data/projects/${projectId}/shots`)
+    },
+
+    getSequences: (projectId) => {
+      return kitsuClientInstance.get(`/data/projects/${projectId}/sequences`)
+    },
+
+    getEpisodes: (projectId) => {
+      return kitsuClientInstance.get(`/data/projects/${projectId}/episodes`)
+    },
+
+    getEdits: (projectId) => {
+      return kitsuClientInstance.get(`/data/projects/${projectId}/edits`)
+    },
+
+    getTaskTypes: (projectId) => {
+      return kitsuClientInstance.get(
+        projectId
+          ? `/data/projects/${projectId}/task-types`
+          : "/data/task-types"
+      )
+    },
+
+    getTasksForEntity: (entityId) => {
+      return kitsuClientInstance.get(`/data/tasks?entity_id=${entityId}`)
+    },
+
+    getTask: (taskId) => {
+      return kitsuClientInstance.get(`/data/tasks/${taskId}`)
     },
 
     fetchTickets: (productionId, episodeId) => {
